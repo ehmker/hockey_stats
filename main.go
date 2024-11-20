@@ -29,13 +29,36 @@ func CreateState() (state, error) {
 	}, nil
 }
 
+func (s state) resetDB() error {
+	err := s.db.ResetSkaterGameStats(context.Background())
+	if err != nil {
+		return err
+	}
+	err = s.db.ResetPenSummaries(context.Background())
+	if err != nil {
+		return err
+	}
+	err = s.db.ResetScoringSummaries(context.Background())
+	if err != nil {
+		return err
+	}
+	err = s.db.ResetGameResults(context.Background())
+	if err != nil {
+		return err
+	}
+	return nil
+}	
+
 func main() {
 	s, err := CreateState()
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	
+	err = s.resetDB()
+	if err != nil {
+		log.Fatal(err)
+	}
 	gameResultParams, err := ScrapeGameResults()
 	if err != nil{
 		log.Fatalf("error scraping game results %v", err)
@@ -45,10 +68,9 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	
+
+	AddPenaltySummary(s)
+	AddScoringSummaryToDB(s)
+	AddPlayerStats(s)
 }
 
-
-// func ScrapeBoxScore () {
-
-// }

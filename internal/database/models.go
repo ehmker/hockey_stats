@@ -5,7 +5,10 @@
 package database
 
 import (
+	"database/sql"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type GameResult struct {
@@ -24,4 +27,66 @@ type GameResult struct {
 	AwayTeamScore  int32
 	AwayTeamResult string
 	AwayTeamRecord string
+}
+
+type PenaltySummary struct {
+	ID        uuid.UUID
+	Gameid    string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Period    string
+	Time      time.Time
+	Team      string
+	Player    string
+	PlayerID  string
+	Penalty   string
+	Pim       int32
+}
+
+type ScoringSummary struct {
+	ID              uuid.UUID
+	Gameid          string
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+	Period          string
+	Time            time.Time
+	Team            string
+	ScoringPlayer   string
+	ScoringPlayerID string
+	FirstAssist     sql.NullString
+	FirstAssistID   sql.NullString
+	SecondAssist    sql.NullString
+	SecondAssistID  sql.NullString
+	EmptyNet        bool
+}
+
+type SkaterGameStat struct {
+	ID          uuid.UUID
+	Gameid      string
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	Team        string
+	PlayerName  string
+	Playerid    string
+	Goals       int32
+	Assists     int32
+	Points      int32
+	PlusMinus   int32
+	PenMins     int32
+	GoalsEv     int32
+	GoalsPp     int32
+	GoalsSh     int32
+	GoalsGw     int32
+	AssistsEv   int32
+	AssistsPp   int32
+	AssistsSh   int32
+	Shots       int32
+	ShotPercent sql.NullString
+	Shifts      int32
+	TimeOnIce   int32
+}
+
+type Team struct {
+	FullName  string
+	ShortName string
 }

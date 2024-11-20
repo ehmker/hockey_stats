@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -17,9 +16,8 @@ func Read() Config {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
-	
+
 	db_url := os.Getenv("DB_URL")
-	fmt.Println(db_url)
 	return Config{
 		DB_URL: db_url,
 	}
