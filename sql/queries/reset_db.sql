@@ -9,3 +9,6 @@ DELETE from scoring_summaries;
 
 -- name: ResetSkaterGameStats :exec
 DELETE from skater_game_stats;
+
+-- name: ResetShots :exec
+DELETE from shots;

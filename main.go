@@ -34,6 +34,10 @@ func (s state) resetDB() error {
 	if err != nil {
 		return err
 	}
+	err = s.db.ResetShots(context.Background())
+	if err != nil {
+		return err
+	}
 	err = s.db.ResetPenSummaries(context.Background())
 	if err != nil {
 		return err
@@ -46,6 +50,7 @@ func (s state) resetDB() error {
 	if err != nil {
 		return err
 	}
+	
 	return nil
 }	
 
@@ -72,5 +77,6 @@ func main() {
 	AddPenaltySummary(s)
 	AddScoringSummaryToDB(s)
 	AddPlayerStats(s)
+	AddShotLocationsToDB(s)
 }
 

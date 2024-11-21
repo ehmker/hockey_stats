@@ -60,6 +60,18 @@ type ScoringSummary struct {
 	EmptyNet        bool
 }
 
+type Shot struct {
+	ID        uuid.UUID
+	Gameid    string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Team      string
+	Player    string
+	XLoc      int32
+	YLoc      int32
+	Goal      bool
+}
+
 type SkaterGameStat struct {
 	ID          uuid.UUID
 	Gameid      string

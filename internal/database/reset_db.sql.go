@@ -36,6 +36,15 @@ func (q *Queries) ResetScoringSummaries(ctx context.Context) error {
 	return err
 }
 
+const resetShots = `-- name: ResetShots :exec
+DELETE from shots
+`
+
+func (q *Queries) ResetShots(ctx context.Context) error {
+	_, err := q.db.ExecContext(ctx, resetShots)
+	return err
+}
+
 const resetSkaterGameStats = `-- name: ResetSkaterGameStats :exec
 DELETE from skater_game_stats
 `
