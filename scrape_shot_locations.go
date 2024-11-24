@@ -4,7 +4,6 @@ import (
 	"context"
 	"log"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -13,10 +12,6 @@ import (
 	"github.com/google/uuid"
 )
 
-type shotCoordinates struct{
-	x_loc int
-	y_loc int
-}
 
 func AddShotLocationsToDB (s state) {
 	// Open the local HTML file
@@ -36,29 +31,7 @@ func AddShotLocationsToDB (s state) {
 	}
 }
 
-func getShotCoordinates (shot_string string) shotCoordinates {
-	// expect similar: "top: 204px; left: 80px"
-	s := strings.Split(shot_string, ";") // ["top: 204px", "left: 80px"]
-	x_coord_str := strings.Split(s[1], ": ")[1] //"80px"
-	x_coord_str = strings.TrimSuffix(x_coord_str, "px") //"80"
-	x_coord_int, err := strconv.Atoi(x_coord_str)
-	if err != nil {
-		log.Printf("error converting x coord to int [%v]: %v", x_coord_str, err)
-		return shotCoordinates{}
-	}
 
-	y_coord_str := strings.Split(s[0], ": ")[1] //"204px"
-	y_coord_str = strings.TrimSuffix(y_coord_str, "px") //"204"
-	y_coord_int, err := strconv.Atoi(y_coord_str)
-	if err != nil {
-		log.Printf("error converting y coord to in [%v]: %v", y_coord_str, err)
-		return shotCoordinates{}
-	}
-	return shotCoordinates{
-		x_loc: x_coord_int,
-		y_loc: y_coord_int,
-	}
-}
 
 func scrapeShotLocations (f *os.File, s state) []database.CreateShotParams{
 	doc, err := goquery.NewDocumentFromReader(f)

@@ -4,8 +4,6 @@ import (
 	"context"
 	"log"
 	"os"
-	"strconv"
-	"strings"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
@@ -13,43 +11,6 @@ import (
 	"github.com/google/uuid"
 )
 
-func getTeamFromStatTableID (id string) string {
-	return strings.Split(id, "_")[1]
-}
-
-func getIntStatFromCell (stat string, s *goquery.Selection) int32 {
-	selection_string := "td[data-stat='" + stat + "']"
-	str := s.Find(selection_string).Text()
-	num, err := strconv.Atoi(str)
-	if err != nil {
-		log.Printf("error converting %s: %v\n", stat, err)
-		return 0
-	}
-	return int32(num)
-}
-
-func getPlayerFromStatCell (s *goquery.Selection) Player {
-	return getPlayerDetailFromCell(s.Find("td[data-stat='player'] a"))
-}
-
-// Extract the time in MM:SS format and returns the time as seconds 
-func getTimeStatFromCell (stat string, s *goquery.Selection) int32 {
-	selection_string := "td[data-stat='" + stat + "']"
-	time_string := strings.Split(s.Find(selection_string).Text(),":")
-	minutes, err  := strconv.Atoi(time_string[0])
-	if err != nil {
-		log.Printf("error converting minute string to int [%v]: %v", time_string[0], err)
-		return 0
-	}
-	seconds, err := strconv.Atoi(time_string[1])
-	if err != nil {
-		log.Printf("error converting seconds string to int [%v]: %v", time_string[1], err)
-		return 0
-	}
-
-	return int32(minutes * 60 + seconds)
-
-}
 
 func AddPlayerStats(s state) {
 	file, err := os.Open("example_2.htm")
@@ -83,7 +44,7 @@ func ScrapePlayerStats (f *os.File) []database.CreateSkaterGameStatsParams {
 		var team string
 		divID, exist := div.Attr("id")
 		if exist == true{
-			team = getTeamFromStatTableID(divID)
+			team = getTeamFromPlayerStatTableID(divID)
 		}
 
 		// Extract each player's statline for the game
@@ -117,10 +78,6 @@ func ScrapePlayerStats (f *os.File) []database.CreateSkaterGameStatsParams {
 			
 			skaterStatsSlice = append(skaterStatsSlice, skaterStats)
 			})
-			
-		
 	})
-
-
 	return skaterStatsSlice
 }

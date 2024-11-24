@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path"
 	"strings"
 	"time"
 
@@ -14,10 +13,7 @@ import (
 	"github.com/ehmker/hockey_stats/internal/database"
 	"github.com/google/uuid"
 )
-type Player struct {
-	name string
-	id string
-}
+
 
 func AddScoringSummaryToDB(s state) {
 	// Open the local HTML file
@@ -36,18 +32,6 @@ func AddScoringSummaryToDB(s state) {
 		}
 	}
 
-}
-
-
-func getPlayerDetailFromCell(player *goquery.Selection) Player {
-	playerName := strings.TrimSpace(player.Text())
-	playerHref, _ := player.Attr("href")
-	playerId := path.Base(playerHref)
-	playerId = strings.TrimSuffix(playerId, ".html")
-	return Player{
-		name: playerName,
-		id: playerId,
-	}
 }
 
 func scrapeScoringSummary(f *os.File) []database.CreateScoringSummaryParams {

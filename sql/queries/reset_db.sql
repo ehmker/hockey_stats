@@ -12,3 +12,6 @@ DELETE from skater_game_stats;
 
 -- name: ResetShots :exec
 DELETE from shots;
+
+-- name: ResetGoalieStats :exec
+DELETE FROM goalie_game_stats;

@@ -29,6 +29,24 @@ type GameResult struct {
 	AwayTeamRecord string
 }
 
+type GoalieGameStat struct {
+	ID           uuid.UUID
+	Gameid       string
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	Team         string
+	PlayerName   string
+	Playerid     string
+	Decision     sql.NullString
+	GoalsAgainst int32
+	ShotsAgainst int32
+	Saves        int32
+	SavePercent  sql.NullString
+	Shutout      bool
+	PenMins      int32
+	TimeOnIce    int32
+}
+
 type PenaltySummary struct {
 	ID        uuid.UUID
 	Gameid    string

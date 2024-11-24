@@ -30,7 +30,11 @@ func CreateState() (state, error) {
 }
 
 func (s state) resetDB() error {
-	err := s.db.ResetSkaterGameStats(context.Background())
+	err := s.db.ResetGoalieStats(context.Background())
+	if err != nil {
+		return err
+	}
+	err = s.db.ResetSkaterGameStats(context.Background())
 	if err != nil {
 		return err
 	}
@@ -78,5 +82,6 @@ func main() {
 	AddScoringSummaryToDB(s)
 	AddPlayerStats(s)
 	AddShotLocationsToDB(s)
+	AddGoalieStats(s)
 }
 
