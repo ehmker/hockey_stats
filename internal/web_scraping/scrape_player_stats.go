@@ -1,4 +1,4 @@
-package main
+package web_scraping
 
 import (
 	"context"
@@ -8,11 +8,12 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/ehmker/hockey_stats/internal/database"
+	"github.com/ehmker/hockey_stats/internal/shared"
 	"github.com/google/uuid"
 )
 
 
-func AddPlayerStats(s state) {
+func AddPlayerStats(s shared.State) {
 	file, err := os.Open("example_2.htm")
 	if err != nil {
 		log.Fatalf("Error opening file: %v", err)
@@ -22,7 +23,7 @@ func AddPlayerStats(s state) {
 	playerStatLines := ScrapePlayerStats(file)
 
 	for _, statline := range playerStatLines{
-		_, err = s.db.CreateSkaterGameStats(context.Background(), statline)
+		_, err = s.DB.CreateSkaterGameStats(context.Background(), statline)
 		if err != nil {
 			log.Printf("error adding skater game stats: %v", err)
 		}

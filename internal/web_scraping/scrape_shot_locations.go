@@ -1,4 +1,4 @@
-package main
+package web_scraping
 
 import (
 	"context"
@@ -9,11 +9,12 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/ehmker/hockey_stats/internal/database"
+	"github.com/ehmker/hockey_stats/internal/shared"
 	"github.com/google/uuid"
 )
 
 
-func AddShotLocationsToDB (s state) {
+func AddShotLocationsToDB (s shared.State) {
 	// Open the local HTML file
 	file, err := os.Open("example_2.htm")
 	if err != nil {
@@ -24,7 +25,7 @@ func AddShotLocationsToDB (s state) {
 	shotList := scrapeShotLocations(file, s)
 
 	for _, shot := range shotList {
-		_, err = s.db.CreateShot(context.Background(), shot)
+		_, err = s.DB.CreateShot(context.Background(), shot)
 		if err != nil {
 			log.Panicf("error adding scoring summary: %v\n", err)
 		}
@@ -33,7 +34,7 @@ func AddShotLocationsToDB (s state) {
 
 
 
-func scrapeShotLocations (f *os.File, s state) []database.CreateShotParams{
+func scrapeShotLocations (f *os.File, s shared.State) []database.CreateShotParams{
 	doc, err := goquery.NewDocumentFromReader(f)
 	if err != nil {
 		log.Fatalf("Error parsing HTML: %v", err)
@@ -42,7 +43,7 @@ func scrapeShotLocations (f *os.File, s state) []database.CreateShotParams{
 
 	doc.Find(".shotchart").Each(func(i int, div *goquery.Selection) {
 		full_team_name := div.Find("h4").Text()
-		short_name, err := s.db.GetTeamShortName(context.Background(), full_team_name)
+		short_name, err := s.DB.GetTeamShortName(context.Background(), full_team_name)
 		if err != nil {
 			log.Printf("unable to get team short name of [%v]: %v\n", full_team_name, err)
 			return

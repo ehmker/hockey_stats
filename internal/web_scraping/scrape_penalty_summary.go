@@ -1,4 +1,4 @@
-package main
+package web_scraping
 
 import (
 	"context"
@@ -11,10 +11,11 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/ehmker/hockey_stats/internal/database"
+	"github.com/ehmker/hockey_stats/internal/shared"
 	"github.com/google/uuid"
 )
 
-func AddPenaltySummary(s state) {
+func AddPenaltySummary(s shared.State) {
 	// Open the local HTML file
 	file, err := os.Open("example_2.htm")
 	if err != nil {
@@ -25,7 +26,7 @@ func AddPenaltySummary(s state) {
 	penaltySummary := scrapePenaltySummary(file)
 
 	for _, penalty := range penaltySummary{
-		_, err := s.db.CreatePenaltySummary(context.Background(), penalty)
+		_, err := s.DB.CreatePenaltySummary(context.Background(), penalty)
 		if err != nil {
 			log.Println("unable to add to penalty_summaries: ", err)
 		}

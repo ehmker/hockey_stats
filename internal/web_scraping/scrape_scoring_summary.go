@@ -1,4 +1,4 @@
-package main
+package web_scraping
 
 import (
 	"context"
@@ -11,11 +11,12 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/ehmker/hockey_stats/internal/database"
+	"github.com/ehmker/hockey_stats/internal/shared"
 	"github.com/google/uuid"
 )
 
 
-func AddScoringSummaryToDB(s state) {
+func AddScoringSummaryToDB(s shared.State) {
 	// Open the local HTML file
 	file, err := os.Open("example_2.htm")
 	if err != nil {
@@ -26,7 +27,7 @@ func AddScoringSummaryToDB(s state) {
 	scoringSummary := scrapeScoringSummary(file)
 
 	for _, score := range scoringSummary{
-		_, err = s.db.CreateScoringSummary(context.Background(), score)
+		_, err = s.DB.CreateScoringSummary(context.Background(), score)
 		if err != nil {
 			log.Panicf("error adding scoring summary: %v\n", err)
 		}

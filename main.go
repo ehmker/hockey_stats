@@ -9,54 +9,25 @@ import (
 
 	"github.com/ehmker/hockey_stats/internal/config"
 	"github.com/ehmker/hockey_stats/internal/database"
+	"github.com/ehmker/hockey_stats/internal/shared"
+	"github.com/ehmker/hockey_stats/internal/web_scraping"
 	_ "github.com/lib/pq"
 )
 
-type state struct {
-	cfg *config.Config
-	db *database.Queries
-}
-func CreateState() (state, error) {
+func CreateState() (shared.State, error) {
 	c := config.Read()
 	db, err := sql.Open("postgres", c.DB_URL)
 	if err != nil {
-		return state{}, fmt.Errorf("problem opening database: %v", err)
+		return shared.State{}, fmt.Errorf("problem opening database: %v", err)
 	}
 	dbQueries := database.New(db)
-	return state{
-		cfg: &c,
-		db: dbQueries,
+	return shared.State{
+		Cfg: &c,
+		DB: dbQueries,
 	}, nil
 }
 
-func (s state) resetDB() error {
-	err := s.db.ResetGoalieStats(context.Background())
-	if err != nil {
-		return err
-	}
-	err = s.db.ResetSkaterGameStats(context.Background())
-	if err != nil {
-		return err
-	}
-	err = s.db.ResetShots(context.Background())
-	if err != nil {
-		return err
-	}
-	err = s.db.ResetPenSummaries(context.Background())
-	if err != nil {
-		return err
-	}
-	err = s.db.ResetScoringSummaries(context.Background())
-	if err != nil {
-		return err
-	}
-	err = s.db.ResetGameResults(context.Background())
-	if err != nil {
-		return err
-	}
-	
-	return nil
-}	
+
 
 func main() {
 	s, err := CreateState()
@@ -64,24 +35,24 @@ func main() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	err = s.resetDB()
+	err = s.ResetDB()
 	if err != nil {
 		log.Fatal(err)
 	}
-	gameResultParams, err := ScrapeGameResults()
+	gameResultParams, err := web_scraping.ScrapeGameResults()
 	if err != nil{
 		log.Fatalf("error scraping game results %v", err)
 	}
 
-	_, err = s.db.CreateGameResult(context.Background(), gameResultParams)
+	_, err = s.DB.CreateGameResult(context.Background(), gameResultParams)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	AddPenaltySummary(s)
-	AddScoringSummaryToDB(s)
-	AddPlayerStats(s)
-	AddShotLocationsToDB(s)
-	AddGoalieStats(s)
+	web_scraping.AddPenaltySummary(s)
+	web_scraping.AddScoringSummaryToDB(s)
+	web_scraping.AddPlayerStats(s)
+	web_scraping.AddShotLocationsToDB(s)
+	web_scraping.AddGoalieStats(s)
 }
 
