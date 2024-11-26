@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -15,15 +14,14 @@ import (
 	"github.com/google/uuid"
 )
 
-func AddPenaltySummary(s shared.State) {
+func AddPenaltySummary(s shared.State, doc *goquery.Document, gameID string) {
 	// Open the local HTML file
-	file, err := os.Open("example_2.htm")
-	if err != nil {
-		log.Fatalf("Error opening file: %v", err)
-	}
-	defer file.Close()
-
-	penaltySummary := scrapePenaltySummary(file)
+	// file, err := os.Open("example_pages/example_2.htm")
+	// if err != nil {
+	// 	log.Fatalf("Error opening file: %v", err)
+	// }
+	// defer file.Close()
+	penaltySummary := scrapePenaltySummary(doc, gameID)
 
 	for _, penalty := range penaltySummary{
 		_, err := s.DB.CreatePenaltySummary(context.Background(), penalty)
@@ -34,12 +32,7 @@ func AddPenaltySummary(s shared.State) {
 
 }
 
-func scrapePenaltySummary (f *os.File) []database.CreatePenaltySummaryParams{
-	doc, err := goquery.NewDocumentFromReader(f)
-	if err != nil {
-		log.Fatalf("Error parsing HTML: %v", err)
-	}
-
+func scrapePenaltySummary (doc *goquery.Document, ID string) []database.CreatePenaltySummaryParams{
 	var penaltySummarySlice []database.CreatePenaltySummaryParams
 	
 	//Extract the first penalty period from table 
@@ -54,7 +47,7 @@ func scrapePenaltySummary (f *os.File) []database.CreatePenaltySummaryParams{
 
 			penaltySum := database.CreatePenaltySummaryParams {
 				ID: uuid.New(),
-				Gameid: "1",
+				Gameid: ID,
 				CreatedAt: time.Now(),
 				UpdatedAt: time.Now(),
 				Period: period,

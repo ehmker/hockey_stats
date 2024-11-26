@@ -1,38 +1,47 @@
 package web_scraping
 
 import (
+	"context"
 	"fmt"
 	"log"
-	"os"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/ehmker/hockey_stats/internal/database"
+	"github.com/ehmker/hockey_stats/internal/shared"
 )
 
-func ScrapeGameResults () (database.CreateGameResultParams, error) {
-	// Open the local HTML file
-	file, err := os.Open("boxscore_example.htm")
+func AddGameResults(s shared.State, doc *goquery.Document, gameID string) {
+	gameResult, err := ScrapeGameResults(doc, gameID)
 	if err != nil {
-		log.Fatalf("Error opening file: %v", err)
+		log.Printf("error scraping game results: %v\n", err)
+		return
 	}
-	defer file.Close()
+	s.DB.CreateGameResult(context.Background(), gameResult)
 
+}
+
+func ScrapeGameResults (doc *goquery.Document, gameID string) (database.CreateGameResultParams, error) {
+	// // Open the local HTML file
+	// file, err := os.Open("example_pages/example_2.htm")
+	// if err != nil {
+	// 	log.Fatalf("Error opening file: %v", err)
+	// }
+	// defer file.Close()
+
+	// // Load the HTML document
+	// doc, err := goquery.NewDocumentFromReader(file)
+	// if err != nil {
+	// 	log.Fatalf("Error parsing HTML: %v", err)
+	// }
+	
 	results := database.CreateGameResultParams {
-		ID: "1",
+		ID: gameID,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
-
-	// Load the HTML document
-	doc, err := goquery.NewDocumentFromReader(file)
-	if err != nil {
-		log.Fatalf("Error parsing HTML: %v", err)
-	}
-
-	
 
 	// Find team names and scores
 	doc.Find(".scorebox > div").Each(func(i int, s *goquery.Selection) {
@@ -47,6 +56,7 @@ func ScrapeGameResults () (database.CreateGameResultParams, error) {
 		// Extract score
 		score_string := s.Find(".scores .score").Text()
 		var score_int int
+		var err error
 		if score_string != "" {
 			score_int, err = strconv.Atoi(score_string)
 			if err != nil{
@@ -90,7 +100,7 @@ func ScrapeGameResults () (database.CreateGameResultParams, error) {
 		case 0:
 			timeLayout := "January 02, 2006, 3:04 PM"
 			parsedTime, err := time.Parse(timeLayout, s.Text())
-			fmt.Println(parsedTime)
+			// fmt.Println(parsedTime)
 			if err != nil {
 				fmt.Printf("unable to parse time for Date Played: %v\n", err)
 				return
@@ -117,7 +127,7 @@ func ScrapeGameResults () (database.CreateGameResultParams, error) {
 		//Expected format "Game Duration: 2:28"
 		case 3: 
 			duration_string := strings.Split(s.Text(), ": ")[1]
-			fmt.Println(duration_string)
+			// fmt.Println(duration_string)
 			timeLayout := "3:04"
 			parsedTime, err := time.Parse(timeLayout, duration_string)
 			if err != nil {
@@ -133,7 +143,16 @@ func ScrapeGameResults () (database.CreateGameResultParams, error) {
 
 	//Check if overtime was needed to determine winner
 	var OTNeeded bool
-	if doc.Find(".game_summary.nohover.current .teams .right").Last().Text() == "OT" {
+	lastRow := doc.Find(".game_summary.nohover.current tbody tr").Last()
+
+	// Step 2: Select the last td in that row
+	str := lastRow.Find("td").Last().Text()
+	str = strings.TrimSpace(str)
+	// fmt.Println(str)
+
+
+	//fmt.Println(str)
+	if  str == "OT" || str == "SO"  {
 		OTNeeded = true
 	} else {
 		OTNeeded = false

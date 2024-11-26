@@ -3,7 +3,6 @@ package web_scraping
 import (
 	"context"
 	"log"
-	"os"
 	"strings"
 	"time"
 
@@ -14,18 +13,18 @@ import (
 )
 
 
-func AddShotLocationsToDB (s shared.State) {
+func AddShotLocationsToDB (s shared.State, doc *goquery.Document, gameID string) {
 	// Open the local HTML file
-	file, err := os.Open("example_2.htm")
-	if err != nil {
-		log.Fatalf("Error opening file: %v", err)
-	}
-	defer file.Close()
+	// file, err := os.Open("example_pages/example_2.htm")
+	// if err != nil {
+	// 	log.Fatalf("Error opening file: %v", err)
+	// }
+	// defer file.Close()
 
-	shotList := scrapeShotLocations(file, s)
+	shotList := scrapeShotLocations(s, doc, gameID)
 
 	for _, shot := range shotList {
-		_, err = s.DB.CreateShot(context.Background(), shot)
+		_, err := s.DB.CreateShot(context.Background(), shot)
 		if err != nil {
 			log.Panicf("error adding scoring summary: %v\n", err)
 		}
@@ -34,11 +33,11 @@ func AddShotLocationsToDB (s shared.State) {
 
 
 
-func scrapeShotLocations (f *os.File, s shared.State) []database.CreateShotParams{
-	doc, err := goquery.NewDocumentFromReader(f)
-	if err != nil {
-		log.Fatalf("Error parsing HTML: %v", err)
-	}
+func scrapeShotLocations (s shared.State, doc *goquery.Document, ID string) []database.CreateShotParams{
+	// doc, err := goquery.NewDocumentFromReader(f)
+	// if err != nil {
+	// 	log.Fatalf("Error parsing HTML: %v", err)
+	// }
 	var shotList []database.CreateShotParams
 
 	doc.Find(".shotchart").Each(func(i int, div *goquery.Selection) {
@@ -51,7 +50,7 @@ func scrapeShotLocations (f *os.File, s shared.State) []database.CreateShotParam
 		div.Find("div").Children().Each(func(i int, shot *goquery.Selection) {
 			shotParams := database.CreateShotParams{
 				ID: uuid.New(),
-				Gameid: "1",
+				Gameid: ID,
 				CreatedAt: time.Now(),
 				UpdatedAt: time.Now(),
 				Team: short_name,

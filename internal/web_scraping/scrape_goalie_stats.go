@@ -3,7 +3,6 @@ package web_scraping
 import (
 	"context"
 	"log"
-	"os"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
@@ -12,14 +11,14 @@ import (
 	"github.com/google/uuid"
 )
 
-func AddGoalieStats(s shared.State) {
-	file, err := os.Open("example_2.htm")
-	if err != nil {
-		log.Fatalf("Error opening file: %v", err)
-	}
-	defer file.Close()
+func AddGoalieStats(s shared.State, doc *goquery.Document, gameID string) {
+	// file, err := os.Open("example_pages/example_2.htm")
+	// if err != nil {
+	// 	log.Fatalf("Error opening file: %v", err)
+	// }
+	// defer file.Close()
 
-	goalieStats := scrapeGoalieStats(file)
+	goalieStats := scrapeGoalieStats(doc, gameID)
 
 	for _, statline := range goalieStats {
 		_, err := s.DB.CreateGoalieStats(context.Background(), statline)
@@ -29,11 +28,11 @@ func AddGoalieStats(s shared.State) {
 	}
 }
 
-func scrapeGoalieStats (f *os.File) []database.CreateGoalieStatsParams{
-	doc, err := goquery.NewDocumentFromReader(f)
-	if err != nil {
-		log.Fatalf("Error parsing HTML: %v", err)
-	}
+func scrapeGoalieStats (doc *goquery.Document, ID string) []database.CreateGoalieStatsParams{
+	// doc, err := goquery.NewDocumentFromReader(f)
+	// if err != nil {
+	// 	log.Fatalf("Error parsing HTML: %v", err)
+	// }
 
 	var goalieStatsSlice []database.CreateGoalieStatsParams
 
@@ -52,7 +51,7 @@ func scrapeGoalieStats (f *os.File) []database.CreateGoalieStatsParams{
 				ID: uuid.New(),
 				CreatedAt: time.Now(),
 				UpdatedAt: time.Now(),
-				Gameid: "1",
+				Gameid: ID,
 				Team: team,
 				PlayerName: goalie.name,
 				Playerid: goalie.id,

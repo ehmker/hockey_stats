@@ -16,15 +16,15 @@ import (
 )
 
 
-func AddScoringSummaryToDB(s shared.State) {
+func AddScoringSummaryToDB(s shared.State, doc *goquery.Document, gameID string) {
 	// Open the local HTML file
-	file, err := os.Open("example_2.htm")
+	file, err := os.Open("example_pages/example_2.htm")
 	if err != nil {
 		log.Fatalf("Error opening file: %v", err)
 	}
 	defer file.Close()
 
-	scoringSummary := scrapeScoringSummary(file)
+	scoringSummary := scrapeScoringSummary(doc, gameID)
 
 	for _, score := range scoringSummary{
 		_, err = s.DB.CreateScoringSummary(context.Background(), score)
@@ -35,27 +35,35 @@ func AddScoringSummaryToDB(s shared.State) {
 
 }
 
-func scrapeScoringSummary(f *os.File) []database.CreateScoringSummaryParams {
-	doc, err := goquery.NewDocumentFromReader(f)
-	if err != nil {
-		log.Fatalf("Error parsing HTML: %v", err)
-	}
+func scrapeScoringSummary(doc *goquery.Document, ID string) []database.CreateScoringSummaryParams {
+	// doc, err := goquery.NewDocumentFromReader(f)
+	// if err != nil {
+	// 	log.Fatalf("Error parsing HTML: %v", err)
+	// }
 
 	var scoringSummarySlice []database.CreateScoringSummaryParams
 	
 	//Extract the first scoring period from table 
 	period := doc.Find("#scoring thead th").Text()
-
+	stopParsing := false
 	doc.Find("#scoring tbody tr").Each(func(i int, row *goquery.Selection) {
+		if stopParsing {
+			return
+		}
 		// Check if row is a header row (by presence of <th> instead of <td>)
 		if row.Find("th").Length() > 0 {
 			// It's a header row, update the period information
 			period = row.Find("th").Text()
+			// If game went to shoot out return early
+			if period == "Shootout"{
+				stopParsing = true
+				return
+			}
 		} else {
 
 			scoringSum := database.CreateScoringSummaryParams {
 				ID: uuid.New(),
-				Gameid: "1",
+				Gameid: ID,
 				CreatedAt: time.Now(),
 				UpdatedAt: time.Now(),
 				Period: period,

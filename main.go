@@ -1,11 +1,11 @@
 package main
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/ehmker/hockey_stats/internal/config"
 	"github.com/ehmker/hockey_stats/internal/database"
@@ -39,20 +39,47 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	gameResultParams, err := web_scraping.ScrapeGameResults()
-	if err != nil{
-		log.Fatalf("error scraping game results %v", err)
-	}
 
-	_, err = s.DB.CreateGameResult(context.Background(), gameResultParams)
-	if err != nil {
-		log.Fatalln(err)
-	}
+	// // Open the local HTML file
+	// file, err := os.Open("example_pages/example_3.htm")
+	// if err != nil {
+	// 	log.Fatalf("Error opening file: %v", err)
+	// }
+	// defer file.Close()
 
-	web_scraping.AddPenaltySummary(s)
-	web_scraping.AddScoringSummaryToDB(s)
-	web_scraping.AddPlayerStats(s)
-	web_scraping.AddShotLocationsToDB(s)
-	web_scraping.AddGoalieStats(s)
+	// // Load the HTML document
+	// doc, err := goquery.NewDocumentFromReader(file)
+	// if err != nil {
+	// 	log.Fatalf("Error parsing HTML: %v", err)
+	// }
+
+	// // Step 1: Select the last row in tbody
+	// lastRow := doc.Find(".game_summary.nohover.current tbody tr").Last()
+
+	// // Step 2: Select the last td in that row
+	// lastCell := lastRow.Find("td").Last().Text()
+
+	// fmt.Println(strings.TrimSpace(lastCell))
+
+	AddGamesOfDay(s, "2024/11/23")
 }
 
+// game_date structure = "YYYY/MM/DD"
+func AddGamesOfDay(s shared.State, game_date string) {
+	url := "https://www.hockey-reference.com/boxscores/"
+	if game_date != "" {
+		url += game_date
+	}
+
+	gamesList := web_scraping.ScrapeGameLinks(url)
+
+	for _, game := range gamesList {
+		
+		web_scraping.AddGameToDB(s, game)
+		fmt.Printf("url: %v | ID: %v\n", game.Url, game.Gameid)
+		time.Sleep(20 * time.Second)
+		// break
+	}
+
+
+}

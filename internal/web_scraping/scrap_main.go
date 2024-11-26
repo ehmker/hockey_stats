@@ -2,13 +2,33 @@ package web_scraping
 
 import (
 	"database/sql"
+	"fmt"
+	"io"
 	"log"
+	"net/http"
 	"path"
 	"strconv"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/ehmker/hockey_stats/internal/shared"
 )
+
+type GameLink struct {
+	Url string
+	Gameid string
+}
+
+type Player struct {
+	name string
+	id string
+}
+
+type shotCoordinates struct{
+	x_loc int
+	y_loc int
+}
+
 
 // extracts the team short name from passed goalie table id string
 func getTeamFromGoalieStatTableID (s string) string {
@@ -73,10 +93,7 @@ func getTimeStatFromCell (stat string, s *goquery.Selection) int32 {
 
 }
 
-type Player struct {
-	name string
-	id string
-}
+
 
 // extracts the player name and playerid from cell
 func getPlayerDetailFromCell(player *goquery.Selection) Player {
@@ -91,10 +108,7 @@ func getPlayerDetailFromCell(player *goquery.Selection) Player {
 }
 
 
-type shotCoordinates struct{
-	x_loc int
-	y_loc int
-}
+
 
 // Extracts the shot coordinates from given string
 func getShotCoordinates (shot_string string) shotCoordinates {
@@ -130,3 +144,54 @@ func intToBool(i interface{}) bool {
 		return false
 	}
 }
+
+func AddGameToDB(s shared.State, game GameLink ) {
+	resp, err := http.Get(game.Url)
+	if err != nil {
+		log.Println(err)
+		return 
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		log.Println(err)
+		return
+	}
+	// file, err := os.Create("example_pages/response.htm")
+	// 	if err != nil {
+	// 		fmt.Println("Error creating file:", err)
+	// 		return
+	// 	}
+	// 	defer file.Close()
+	
+	// 	// Write response body to file
+	// 	_, err = io.Copy(file, resp.Body)
+	// 	if err != nil {
+	// 		fmt.Println("Error saving response to file:", err)
+	// 		return
+	// 	}
+
+	// Removing all comment sections from the response
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println("error reading response body:", err)
+		return
+	}
+	bodyString := string(body)
+	cleanedBody := strings.ReplaceAll(bodyString, "<!--", "")
+	cleanedBody = strings.ReplaceAll(cleanedBody, "-->", "")
+
+
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(cleanedBody))
+	if err != nil {
+		log.Printf("error getting document from reader: %v\n", err)
+		return
+	}
+	AddGameResults(s, doc, game.Gameid)
+	AddPenaltySummary(s, doc, game.Gameid)
+	AddScoringSummaryToDB(s, doc, game.Gameid)
+	AddPlayerStats(s, doc, game.Gameid)
+	AddShotLocationsToDB(s, doc, game.Gameid)
+	AddGoalieStats(s, doc, game.Gameid)
+}
+
