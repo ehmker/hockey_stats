@@ -61,6 +61,11 @@ type PenaltySummary struct {
 	Pim       int32
 }
 
+type ProjectMetadatum struct {
+	Key   string
+	Value string
+}
+
 type ScoringSummary struct {
 	ID              uuid.UUID
 	Gameid          string

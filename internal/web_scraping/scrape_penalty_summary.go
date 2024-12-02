@@ -67,7 +67,7 @@ func scrapePenaltySummary (doc *goquery.Document, ID string) []database.CreatePe
 			penaltySum.Team = row.Find("td").Eq(1).Text()
 
 			// Extract player
-			player := getPlayerDetailFromCell(row.Find("td").Eq(2).Find("a"))
+			player := getPlayerDetailFromCell(row.Find("td").Eq(2).Find("a").First())
 			//if bench infraction no player ID.  set ID to bench as well
 			if player.name == "Bench" {
 				player.id = "Bench"
@@ -80,10 +80,14 @@ func scrapePenaltySummary (doc *goquery.Document, ID string) []database.CreatePe
 
 			// Extract PIMs
 			pim_string := row.Find("td").Eq(4).Text()  //ex "2 min"
-			pim_int, err := strconv.Atoi(strings.Split(pim_string, " ")[0])
-			if err != nil {
-				log.Panicln("unable to convert PIMs to int: ", err)
+			pim_int := 0
+			if pim_string != ""{ // Checking if the string is not null as penalty shots have no pim amount
+				pim_int, err = strconv.Atoi(strings.Split(pim_string, " ")[0])
+				if err != nil {
+					log.Panicln("unable to convert PIMs to int: ", err)
+				}
 			}
+			
 			penaltySum.Pim = int32(pim_int)
 
 			penaltySummarySlice = append(penaltySummarySlice, penaltySum)

@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"path"
 	"strconv"
 	"strings"
@@ -195,3 +196,20 @@ func AddGameToDB(s shared.State, game GameLink ) {
 	AddGoalieStats(s, doc, game.Gameid)
 }
 
+
+
+func loadLocalTestFile (f string) *goquery.Document {
+	file, err := os.Open(f)
+	if err != nil {
+		log.Fatalf("Error opening file: %v", err)
+	}
+	defer file.Close()
+
+	// Load the HTML document
+	doc, err := goquery.NewDocumentFromReader(file)
+	if err != nil {
+		log.Fatalf("Error parsing HTML: %v", err)
+	}
+
+	return doc
+}

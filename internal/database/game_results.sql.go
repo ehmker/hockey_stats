@@ -90,3 +90,17 @@ func (q *Queries) CreateGameResult(ctx context.Context, arg CreateGameResultPara
 	)
 	return i, err
 }
+
+const getDateOfLastResult = `-- name: GetDateOfLastResult :one
+SELECT date_played
+From game_results
+ORDER BY date_played DESC
+LIMIT 1
+`
+
+func (q *Queries) GetDateOfLastResult(ctx context.Context) (time.Time, error) {
+	row := q.db.QueryRowContext(ctx, getDateOfLastResult)
+	var date_played time.Time
+	err := row.Scan(&date_played)
+	return date_played, err
+}

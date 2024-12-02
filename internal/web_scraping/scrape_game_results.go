@@ -98,7 +98,7 @@ func ScrapeGameResults (doc *goquery.Document, gameID string) (database.CreateGa
 		switch i {
 		// Extract Date Played
 		case 0:
-			timeLayout := "January 02, 2006, 3:04 PM"
+			timeLayout := "January 2, 2006, 3:04 PM"
 			parsedTime, err := time.Parse(timeLayout, s.Text())
 			// fmt.Println(parsedTime)
 			if err != nil {
