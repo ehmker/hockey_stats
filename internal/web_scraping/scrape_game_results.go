@@ -24,19 +24,6 @@ func AddGameResults(s shared.State, doc *goquery.Document, gameID string) {
 }
 
 func ScrapeGameResults (doc *goquery.Document, gameID string) (database.CreateGameResultParams, error) {
-	// // Open the local HTML file
-	// file, err := os.Open("example_pages/example_2.htm")
-	// if err != nil {
-	// 	log.Fatalf("Error opening file: %v", err)
-	// }
-	// defer file.Close()
-
-	// // Load the HTML document
-	// doc, err := goquery.NewDocumentFromReader(file)
-	// if err != nil {
-	// 	log.Fatalf("Error parsing HTML: %v", err)
-	// }
-	
 	results := database.CreateGameResultParams {
 		ID: gameID,
 		CreatedAt: time.Now(),

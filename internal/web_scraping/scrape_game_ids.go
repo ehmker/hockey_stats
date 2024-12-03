@@ -10,20 +10,6 @@ import (
 )
 
 func ScrapeGameLinks (url string) []GameLink {
-
-	// file, err := os.Open("example_pages/games_of_day.htm")
-	// if err != nil {
-	// 	log.Fatalf("Error opening file: %v", err)
-	// }
-	// defer file.Close()
-
-	// Load the HTML document
-	// doc, err := goquery.NewDocumentFromReader(file)
-	// if err != nil {
-	// 	log.Fatalf("Error parsing HTML: %v", err)
-	// }
-
-
 	resp, err := http.Get(url)
 	if err != nil {
 		log.Println(err)

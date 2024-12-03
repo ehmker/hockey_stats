@@ -158,21 +158,9 @@ func AddGameToDB(s shared.State, game GameLink ) {
 		log.Println(err)
 		return
 	}
-	// file, err := os.Create("example_pages/response.htm")
-	// 	if err != nil {
-	// 		fmt.Println("Error creating file:", err)
-	// 		return
-	// 	}
-	// 	defer file.Close()
-	
-	// 	// Write response body to file
-	// 	_, err = io.Copy(file, resp.Body)
-	// 	if err != nil {
-	// 		fmt.Println("Error saving response to file:", err)
-	// 		return
-	// 	}
 
-	// Removing all comment sections from the response
+	// Removing all comment sections from the response 
+	// Wanted information is kept in commented sections which prevents goquery from finding it
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println("error reading response body:", err)
@@ -210,6 +198,5 @@ func loadLocalTestFile (f string) *goquery.Document {
 	if err != nil {
 		log.Fatalf("Error parsing HTML: %v", err)
 	}
-
 	return doc
 }

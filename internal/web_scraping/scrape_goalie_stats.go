@@ -12,12 +12,6 @@ import (
 )
 
 func AddGoalieStats(s shared.State, doc *goquery.Document, gameID string) {
-	// file, err := os.Open("example_pages/example_2.htm")
-	// if err != nil {
-	// 	log.Fatalf("Error opening file: %v", err)
-	// }
-	// defer file.Close()
-
 	goalieStats := scrapeGoalieStats(doc, gameID)
 
 	for _, statline := range goalieStats {
@@ -29,11 +23,6 @@ func AddGoalieStats(s shared.State, doc *goquery.Document, gameID string) {
 }
 
 func scrapeGoalieStats (doc *goquery.Document, ID string) []database.CreateGoalieStatsParams{
-	// doc, err := goquery.NewDocumentFromReader(f)
-	// if err != nil {
-	// 	log.Fatalf("Error parsing HTML: %v", err)
-	// }
-
 	var goalieStatsSlice []database.CreateGoalieStatsParams
 
 	doc.Find("table[id$='_goalies']").Each(func(i int, table *goquery.Selection) {

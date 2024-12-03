@@ -14,13 +14,6 @@ import (
 
 
 func AddShotLocationsToDB (s shared.State, doc *goquery.Document, gameID string) {
-	// Open the local HTML file
-	// file, err := os.Open("example_pages/example_2.htm")
-	// if err != nil {
-	// 	log.Fatalf("Error opening file: %v", err)
-	// }
-	// defer file.Close()
-
 	shotList := scrapeShotLocations(s, doc, gameID)
 
 	for _, shot := range shotList {

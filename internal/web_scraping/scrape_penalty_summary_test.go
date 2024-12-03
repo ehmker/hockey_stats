@@ -75,10 +75,9 @@ func Test_scrapePenaltySummary(t *testing.T) {
 				t.Errorf("scrapePenaltySummary()")
 				for i, g:= range gotStripped{
 					if !reflect.DeepEqual(g, tt.want[i]) {
-						t.Errorf("fail record number: %v\nGot: %v\nWant: %v\n", i, g, tt.want[i])
+						t.Errorf("fail record number: %v\nGot:  %v\nWant: %v\n", i, g, tt.want[i])
 					}
 				}
-				// t.Errorf("scrapePenaltySummary() = %v, \n\nwant %v", gotStripped, tt.want)
 			}
 		})
 	}

@@ -15,12 +15,6 @@ import (
 )
 
 func AddPenaltySummary(s shared.State, doc *goquery.Document, gameID string) {
-	// Open the local HTML file
-	// file, err := os.Open("example_pages/example_2.htm")
-	// if err != nil {
-	// 	log.Fatalf("Error opening file: %v", err)
-	// }
-	// defer file.Close()
 	penaltySummary := scrapePenaltySummary(doc, gameID)
 
 	for _, penalty := range penaltySummary{

@@ -13,12 +13,6 @@ import (
 
 
 func AddPlayerStats(s shared.State, doc *goquery.Document, gameID string) {
-	// file, err := os.Open("example_pages/example_2.htm")
-	// if err != nil {
-	// 	log.Fatalf("Error opening file: %v", err)
-	// }
-	// defer file.Close()
-
 	playerStatLines := ScrapePlayerStats(doc, gameID)
 
 	for _, statline := range playerStatLines{

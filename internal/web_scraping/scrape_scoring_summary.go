@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"os"
 	"strings"
 	"time"
 
@@ -17,17 +16,10 @@ import (
 
 
 func AddScoringSummaryToDB(s shared.State, doc *goquery.Document, gameID string) {
-	// Open the local HTML file
-	file, err := os.Open("example_pages/example_2.htm")
-	if err != nil {
-		log.Fatalf("Error opening file: %v", err)
-	}
-	defer file.Close()
-
 	scoringSummary := scrapeScoringSummary(doc, gameID)
 
 	for _, score := range scoringSummary{
-		_, err = s.DB.CreateScoringSummary(context.Background(), score)
+		_, err := s.DB.CreateScoringSummary(context.Background(), score)
 		if err != nil {
 			log.Panicf("error adding scoring summary: %v\n", err)
 		}

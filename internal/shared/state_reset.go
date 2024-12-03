@@ -1,16 +1,6 @@
 package shared
 
-import (
-	"context"
-
-	"github.com/ehmker/hockey_stats/internal/config"
-	"github.com/ehmker/hockey_stats/internal/database"
-)
-
-type State struct {
-	Cfg *config.Config
-	DB  *database.Queries
-}
+import "context"
 
 func (s State) ResetDB() error {
 	err := s.DB.ResetGoalieStats(context.Background())
