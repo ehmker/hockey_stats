@@ -13,7 +13,7 @@ import (
 )
 
 
-func AddShotLocationsToDB (s shared.State, doc *goquery.Document, gameID string) {
+func addShotLocationsToDB(s shared.State, doc *goquery.Document, gameID string) {
 	shotList := scrapeShotLocations(s, doc, gameID)
 
 	for _, shot := range shotList {
@@ -43,7 +43,7 @@ func scrapeShotLocations (s shared.State, doc *goquery.Document, ID string) []da
 		div.Find("div").Children().Each(func(i int, shot *goquery.Selection) {
 			shotParams := database.CreateShotParams{
 				ID: uuid.New(),
-				Gameid: ID,
+				GameID: ID,
 				CreatedAt: time.Now(),
 				UpdatedAt: time.Now(),
 				Team: short_name,

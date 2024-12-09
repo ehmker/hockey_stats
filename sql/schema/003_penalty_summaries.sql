@@ -1,7 +1,7 @@
 -- +goose Up
 CREATE TABLE IF NOT EXISTS penalty_summaries (
     id UUID PRIMARY KEY,
-    gameid TEXT NOT NULL REFERENCES game_results(id),
+    game_id TEXT NOT NULL REFERENCES game_results(id) ON DELETE CASCADE,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
     period TEXT NOT NULL,

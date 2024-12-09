@@ -17,51 +17,53 @@ const createGoalieStats = `-- name: CreateGoalieStats :one
 
 INSERT INTO GOALIE_GAME_STATS (
     ID,
-    GAMEID, 
+    game_id, 
     CREATED_AT,
     UPDATED_AT,
     TEAM,
     PLAYER_NAME,
-    PLAYERID,
+    player_id,
     DECISION,
     GOALS_AGAINST,
     SHOTS_AGAINST,
     SAVES, 
     SHUTOUT,
     PEN_MINS,
-    TIME_ON_ICE
+    TIME_ON_ICE,
+    SEASON
 )
 VALUES
-($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
-RETURNING id, gameid, created_at, updated_at, team, player_name, playerid, decision, goals_against, shots_against, saves, save_percent, shutout, pen_mins, time_on_ice
+($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+RETURNING id, game_id, created_at, updated_at, team, season, player_name, player_id, decision, goals_against, shots_against, saves, save_percent, shutout, pen_mins, time_on_ice
 `
 
 type CreateGoalieStatsParams struct {
 	ID           uuid.UUID
-	Gameid       string
+	GameID       string
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 	Team         string
 	PlayerName   string
-	Playerid     string
+	PlayerID     string
 	Decision     sql.NullString
 	GoalsAgainst int32
 	ShotsAgainst int32
 	Saves        int32
-	Shutout      bool
+	Shutout      int32
 	PenMins      int32
 	TimeOnIce    int32
+	Season       int32
 }
 
 func (q *Queries) CreateGoalieStats(ctx context.Context, arg CreateGoalieStatsParams) (GoalieGameStat, error) {
 	row := q.db.QueryRowContext(ctx, createGoalieStats,
 		arg.ID,
-		arg.Gameid,
+		arg.GameID,
 		arg.CreatedAt,
 		arg.UpdatedAt,
 		arg.Team,
 		arg.PlayerName,
-		arg.Playerid,
+		arg.PlayerID,
 		arg.Decision,
 		arg.GoalsAgainst,
 		arg.ShotsAgainst,
@@ -69,16 +71,18 @@ func (q *Queries) CreateGoalieStats(ctx context.Context, arg CreateGoalieStatsPa
 		arg.Shutout,
 		arg.PenMins,
 		arg.TimeOnIce,
+		arg.Season,
 	)
 	var i GoalieGameStat
 	err := row.Scan(
 		&i.ID,
-		&i.Gameid,
+		&i.GameID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Team,
+		&i.Season,
 		&i.PlayerName,
-		&i.Playerid,
+		&i.PlayerID,
 		&i.Decision,
 		&i.GoalsAgainst,
 		&i.ShotsAgainst,

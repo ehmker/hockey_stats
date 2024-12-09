@@ -4,6 +4,7 @@ INSERT INTO
         id,
         created_at, 
         updated_at, 
+        season,
         date_played, 
         arena,
         attendance,
@@ -18,7 +19,7 @@ INSERT INTO
         away_team_record
     )
 VALUES
-    ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+    ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
 RETURNING *;
 
 -- name: GetDateOfLastResult :one

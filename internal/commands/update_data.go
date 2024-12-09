@@ -2,8 +2,10 @@ package commands
 
 import (
 	"fmt"
+	"log"
 	"time"
 
+	"github.com/ehmker/hockey_stats/internal/database"
 	"github.com/ehmker/hockey_stats/internal/shared"
 	"github.com/ehmker/hockey_stats/internal/web_scraping"
 )
@@ -16,11 +18,12 @@ func getScrapeCommand() CLICommand {
 	}
 }
 
-func ScrapeData(s shared.State, _ string) error {
+func ScrapeData(s shared.State, _ []string) error {
 	startDate := s.GetLastScrapedDate().AddDate(0, 0, 1) //Start date is day after last scraped
-	endDate := time.Now().AddDate(0, 0, -1) // End date is set to yesterday as site does not update with scores same day
-	
-	for gameday := startDate; gameday.Before(endDate); gameday = gameday.AddDate(0, 0, 1){
+	today := time.Now()
+	// End date is set to yesterday as site does not update with scores same day
+	yesterday := time.Date(today.Year(), today.Month(), today.Day()-1, 0, 0, 0, 0, today.Location())  // setting time to midnight to normalize comparisons
+	for gameday := startDate; gameday.Before(yesterday); gameday = gameday.AddDate(0, 0, 1){
 		addGamesOfDay(s, gameday.Format("2006/01/02"))
 	}
 	s.SetLastScrapedDate()
@@ -38,10 +41,21 @@ func addGamesOfDay(s shared.State, game_date string) {
 	gamesList := web_scraping.ScrapeGameLinks(url)
 
 	for _, game := range gamesList {
-		web_scraping.AddGameToDB(s, game)
-		fmt.Printf("url: %v | ID: %v\n", game.Url, game.Gameid)
-		time.Sleep(20 * time.Second)
+		gameResult, err := web_scraping.AddGameToDB(s, game)
+		if err != nil {
+			log.Printf("error adding game to database:\n\t%v\n", err)
+			return
+		}
+		printGame(gameResult)
+		time.Sleep(20 * time.Second) // 
+		
+		
 	}
 
 
+}
+
+
+func printGame(game database.CreateGameResultParams) {
+	fmt.Printf("%s | (%s) %s: %v at (%s) %s: %v\n", game.ID, game.AwayTeamResult, game.AwayTeam, game.AwayTeamScore, game.HomeTeamResult, game.HomeTeam, game.HomeTeamScore)
 }

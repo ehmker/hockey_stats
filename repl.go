@@ -30,10 +30,10 @@ func startREPL() {
 	for {
 		fmt.Print("Stats > ")
 		reader.Scan()
-		inputCMD, inputLocation := processInput(reader.Text())
+		inputCMD, inputParams := processInput(reader.Text())
 
 		if cmd, ok := commands[inputCMD]; ok {
-			cmd.Callback(s, inputLocation)
+			cmd.Callback(s, inputParams)
 		} else {
 			fmt.Printf("'%v' command not found\n", inputCMD)
 		}
@@ -41,14 +41,14 @@ func startREPL() {
 
 }
 
-func processInput(user_input string) (command, location string) {
+func processInput(user_input string) (command string, location []string) {
 	user_input = strings.ToLower(user_input)
 	split_input := strings.Split(user_input, " ")
 
-	if len(split_input) == 2{
-		return split_input[0], split_input[1]
+	if len(split_input) >= 2{
+		return split_input[0], split_input[1:]
 	}
-	return split_input[0], ""
+	return split_input[0], []string{}
 
 
 }

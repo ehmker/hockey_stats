@@ -17,14 +17,14 @@ const createScoringSummary = `-- name: CreateScoringSummary :one
 INSERT INTO
     scoring_summaries (
         id,
-        gameid,
+        game_id,
         created_at,
         updated_at,
         period,
         time, 
         team,
-        scoring_player,
-        scoring_player_id,
+        player,
+        player_id,
         first_assist,
         first_assist_id,
         second_assist, 
@@ -33,37 +33,37 @@ INSERT INTO
     )
 VALUES
     ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
-RETURNING id, gameid, created_at, updated_at, period, time, team, scoring_player, scoring_player_id, first_assist, first_assist_id, second_assist, second_assist_id, empty_net
+RETURNING id, game_id, created_at, updated_at, period, time, team, player, player_id, first_assist, first_assist_id, second_assist, second_assist_id, empty_net
 `
 
 type CreateScoringSummaryParams struct {
-	ID              uuid.UUID
-	Gameid          string
-	CreatedAt       time.Time
-	UpdatedAt       time.Time
-	Period          string
-	Time            time.Time
-	Team            string
-	ScoringPlayer   string
-	ScoringPlayerID string
-	FirstAssist     sql.NullString
-	FirstAssistID   sql.NullString
-	SecondAssist    sql.NullString
-	SecondAssistID  sql.NullString
-	EmptyNet        bool
+	ID             uuid.UUID
+	GameID         string
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+	Period         string
+	Time           time.Time
+	Team           string
+	Player         string
+	PlayerID       string
+	FirstAssist    sql.NullString
+	FirstAssistID  sql.NullString
+	SecondAssist   sql.NullString
+	SecondAssistID sql.NullString
+	EmptyNet       bool
 }
 
 func (q *Queries) CreateScoringSummary(ctx context.Context, arg CreateScoringSummaryParams) (ScoringSummary, error) {
 	row := q.db.QueryRowContext(ctx, createScoringSummary,
 		arg.ID,
-		arg.Gameid,
+		arg.GameID,
 		arg.CreatedAt,
 		arg.UpdatedAt,
 		arg.Period,
 		arg.Time,
 		arg.Team,
-		arg.ScoringPlayer,
-		arg.ScoringPlayerID,
+		arg.Player,
+		arg.PlayerID,
 		arg.FirstAssist,
 		arg.FirstAssistID,
 		arg.SecondAssist,
@@ -73,14 +73,14 @@ func (q *Queries) CreateScoringSummary(ctx context.Context, arg CreateScoringSum
 	var i ScoringSummary
 	err := row.Scan(
 		&i.ID,
-		&i.Gameid,
+		&i.GameID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Period,
 		&i.Time,
 		&i.Team,
-		&i.ScoringPlayer,
-		&i.ScoringPlayerID,
+		&i.Player,
+		&i.PlayerID,
 		&i.FirstAssist,
 		&i.FirstAssistID,
 		&i.SecondAssist,

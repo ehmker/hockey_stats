@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/ehmker/hockey_stats/internal/database"
 	"github.com/ehmker/hockey_stats/internal/shared"
 )
 
@@ -57,10 +58,9 @@ func getIntStatFromCell (stat string, s *goquery.Selection) int32 {
 
 func getTextStatFromCell_CanBeNull(stat string, s *goquery.Selection) sql.NullString {
 	selection_string := "td[data-stat='" + stat + "']"
-	str := s.Find(selection_string).Text()
+	str := strings.TrimSpace(s.Find(selection_string).Text())
 	if str == "" {
 		return sql.NullString{
-			String: "",
 			Valid: false,
 		}
 	}
@@ -139,24 +139,24 @@ func getShotCoordinates (shot_string string) shotCoordinates {
 func intToBool(i interface{}) bool {
 	switch i.(type) {
 	case int32:
-		return i != 0
+		return i != int32(0)
 	default:
 		log.Printf("unsupported type: %d", i)
 		return false
 	}
 }
 
-func AddGameToDB(s shared.State, game GameLink ) {
+func AddGameToDB(s shared.State, game GameLink ) (database.CreateGameResultParams, error){
 	resp, err := http.Get(game.Url)
 	if err != nil {
 		log.Println(err)
-		return 
+		return database.CreateGameResultParams{}, err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		log.Println(err)
-		return
+		return database.CreateGameResultParams{}, err
 	}
 
 	// Removing all comment sections from the response 
@@ -164,7 +164,7 @@ func AddGameToDB(s shared.State, game GameLink ) {
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println("error reading response body:", err)
-		return
+		return database.CreateGameResultParams{}, err
 	}
 	bodyString := string(body)
 	cleanedBody := strings.ReplaceAll(bodyString, "<!--", "")
@@ -174,14 +174,21 @@ func AddGameToDB(s shared.State, game GameLink ) {
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(cleanedBody))
 	if err != nil {
 		log.Printf("error getting document from reader: %v\n", err)
-		return
+		return database.CreateGameResultParams{}, err
 	}
-	AddGameResults(s, doc, game.Gameid)
-	AddPenaltySummary(s, doc, game.Gameid)
-	AddScoringSummaryToDB(s, doc, game.Gameid)
-	AddPlayerStats(s, doc, game.Gameid)
-	AddShotLocationsToDB(s, doc, game.Gameid)
-	AddGoalieStats(s, doc, game.Gameid)
+	
+	gameDetail, err := addGameResults(s, doc, game.Gameid)
+	if err != nil {
+		// early out if game already has been added to db
+		log.Printf("error adding game results to database: %v\n", err)
+		return database.CreateGameResultParams{}, err
+	}
+	addPlayerStats(s, doc, game.Gameid, gameDetail.Season)
+	addGoalieStats(s, doc, game.Gameid, gameDetail.Season)
+	addPenaltySummary(s, doc, game.Gameid)
+	addScoringSummaryToDB(s, doc, game.Gameid)
+	addShotLocationsToDB(s, doc, game.Gameid)
+	return gameDetail, nil
 }
 
 

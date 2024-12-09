@@ -14,7 +14,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func AddPenaltySummary(s shared.State, doc *goquery.Document, gameID string) {
+func addPenaltySummary(s shared.State, doc *goquery.Document, gameID string) {
 	penaltySummary := scrapePenaltySummary(doc, gameID)
 
 	for _, penalty := range penaltySummary{
@@ -41,7 +41,7 @@ func scrapePenaltySummary (doc *goquery.Document, ID string) []database.CreatePe
 
 			penaltySum := database.CreatePenaltySummaryParams {
 				ID: uuid.New(),
-				Gameid: ID,
+				GameID: ID,
 				CreatedAt: time.Now(),
 				UpdatedAt: time.Now(),
 				Period: period,

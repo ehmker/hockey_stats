@@ -15,12 +15,12 @@ import (
 const createSkaterGameStats = `-- name: CreateSkaterGameStats :one
 INSERT INTO skater_game_stats (
     ID,
-    GAMEID, 
+    game_id, 
     CREATED_AT,
     UPDATED_AT,
     TEAM, 
     PLAYER_NAME, 
-    PLAYERID, 
+    player_id, 
     GOALS, 
     ASSISTS,
     POINTS, 
@@ -35,21 +35,22 @@ INSERT INTO skater_game_stats (
     ASSISTS_SH,
     SHOTS,
     SHIFTS,
-    TIME_ON_ICE
+    TIME_ON_ICE,
+    SEASON
 )
 VALUES
-($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)
-RETURNING id, gameid, created_at, updated_at, team, player_name, playerid, goals, assists, points, plus_minus, pen_mins, goals_ev, goals_pp, goals_sh, goals_gw, assists_ev, assists_pp, assists_sh, shots, shot_percent, shifts, time_on_ice
+($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23)
+RETURNING id, game_id, created_at, updated_at, team, season, player_name, player_id, goals, assists, points, plus_minus, pen_mins, goals_ev, goals_pp, goals_sh, goals_gw, assists_ev, assists_pp, assists_sh, shots, shot_percent, shifts, time_on_ice
 `
 
 type CreateSkaterGameStatsParams struct {
 	ID         uuid.UUID
-	Gameid     string
+	GameID     string
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 	Team       string
 	PlayerName string
-	Playerid   string
+	PlayerID   string
 	Goals      int32
 	Assists    int32
 	Points     int32
@@ -65,17 +66,18 @@ type CreateSkaterGameStatsParams struct {
 	Shots      int32
 	Shifts     int32
 	TimeOnIce  int32
+	Season     int32
 }
 
 func (q *Queries) CreateSkaterGameStats(ctx context.Context, arg CreateSkaterGameStatsParams) (SkaterGameStat, error) {
 	row := q.db.QueryRowContext(ctx, createSkaterGameStats,
 		arg.ID,
-		arg.Gameid,
+		arg.GameID,
 		arg.CreatedAt,
 		arg.UpdatedAt,
 		arg.Team,
 		arg.PlayerName,
-		arg.Playerid,
+		arg.PlayerID,
 		arg.Goals,
 		arg.Assists,
 		arg.Points,
@@ -91,16 +93,18 @@ func (q *Queries) CreateSkaterGameStats(ctx context.Context, arg CreateSkaterGam
 		arg.Shots,
 		arg.Shifts,
 		arg.TimeOnIce,
+		arg.Season,
 	)
 	var i SkaterGameStat
 	err := row.Scan(
 		&i.ID,
-		&i.Gameid,
+		&i.GameID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Team,
+		&i.Season,
 		&i.PlayerName,
-		&i.Playerid,
+		&i.PlayerID,
 		&i.Goals,
 		&i.Assists,
 		&i.Points,

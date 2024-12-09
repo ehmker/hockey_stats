@@ -15,7 +15,7 @@ import (
 )
 
 
-func AddScoringSummaryToDB(s shared.State, doc *goquery.Document, gameID string) {
+func addScoringSummaryToDB(s shared.State, doc *goquery.Document, gameID string) {
 	scoringSummary := scrapeScoringSummary(doc, gameID)
 
 	for _, score := range scoringSummary{
@@ -55,7 +55,7 @@ func scrapeScoringSummary(doc *goquery.Document, ID string) []database.CreateSco
 
 			scoringSum := database.CreateScoringSummaryParams {
 				ID: uuid.New(),
-				Gameid: ID,
+				GameID: ID,
 				CreatedAt: time.Now(),
 				UpdatedAt: time.Now(),
 				Period: period,
@@ -101,8 +101,8 @@ func scrapeScoringSummary(doc *goquery.Document, ID string) []database.CreateSco
 			for i, p := range scoringPlayers {
 				switch i {
 				case 0: // Goal Scorer
-					scoringSum.ScoringPlayer = p.name
-					scoringSum.ScoringPlayerID = p.id
+					scoringSum.Player = p.name
+					scoringSum.PlayerID = p.id
 				
 				case 1: // Primary Assist
 					scoringSum.FirstAssist = sql.NullString{

@@ -12,10 +12,11 @@ import (
 )
 
 
-func AddPlayerStats(s shared.State, doc *goquery.Document, gameID string) {
+func addPlayerStats(s shared.State, doc *goquery.Document, gameID string, season int32) {
 	playerStatLines := ScrapePlayerStats(doc, gameID)
 
 	for _, statline := range playerStatLines{
+		statline.Season = season
 		_, err := s.DB.CreateSkaterGameStats(context.Background(), statline)
 		if err != nil {
 			log.Printf("error adding skater game stats: %v", err)
@@ -46,12 +47,12 @@ func ScrapePlayerStats (doc *goquery.Document, ID string) []database.CreateSkate
 			p := getPlayerFromStatCell(row)
 			skaterStats := database.CreateSkaterGameStatsParams{
 				ID: uuid.New(),
-				Gameid: ID,
+				GameID: ID,
 				CreatedAt: time.Now(),
 				UpdatedAt: time.Now(),
 				Team: team,
 				PlayerName: p.name,
-				Playerid: p.id,
+				PlayerID: p.id,
 				Goals: getIntStatFromCell("goals", row),
 				Assists: getIntStatFromCell("assists", row),
 				Points: getIntStatFromCell("points", row),

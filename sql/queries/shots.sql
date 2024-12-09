@@ -1,7 +1,7 @@
 -- name: CreateShot :one
 INSERT INTO shots (
     id, 
-    gameid, 
+    game_id, 
     created_at,
     updated_at,
     team, 

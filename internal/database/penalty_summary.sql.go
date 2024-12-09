@@ -16,7 +16,7 @@ const createPenaltySummary = `-- name: CreatePenaltySummary :one
 INSERT INTO
     penalty_summaries (
         id,
-        gameid,
+        game_id,
         created_at,
         updated_at,
         period,
@@ -29,12 +29,12 @@ INSERT INTO
     )
 VALUES
     ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-RETURNING id, gameid, created_at, updated_at, period, time, team, player, player_id, penalty, pim
+RETURNING id, game_id, created_at, updated_at, period, time, team, player, player_id, penalty, pim
 `
 
 type CreatePenaltySummaryParams struct {
 	ID        uuid.UUID
-	Gameid    string
+	GameID    string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Period    string
@@ -49,7 +49,7 @@ type CreatePenaltySummaryParams struct {
 func (q *Queries) CreatePenaltySummary(ctx context.Context, arg CreatePenaltySummaryParams) (PenaltySummary, error) {
 	row := q.db.QueryRowContext(ctx, createPenaltySummary,
 		arg.ID,
-		arg.Gameid,
+		arg.GameID,
 		arg.CreatedAt,
 		arg.UpdatedAt,
 		arg.Period,
@@ -63,7 +63,7 @@ func (q *Queries) CreatePenaltySummary(ctx context.Context, arg CreatePenaltySum
 	var i PenaltySummary
 	err := row.Scan(
 		&i.ID,
-		&i.Gameid,
+		&i.GameID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Period,

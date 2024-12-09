@@ -15,7 +15,7 @@ func getExitCommand() CLICommand{
 	}
 }
 
-func commandExit(_ shared.State, _ string) error{
+func commandExit(_ shared.State, _ []string) error{
 	fmt.Println("Exiting.")
 	os.Exit(0)
 	return nil

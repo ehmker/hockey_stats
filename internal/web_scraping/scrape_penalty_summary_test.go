@@ -14,7 +14,7 @@ func stripIDFromPenSummaries(penSummaries []database.CreatePenaltySummaryParams)
 	stripped := make([]database.CreatePenaltySummaryParams, len(penSummaries))
 	for i, summary := range penSummaries {
 		stripped[i] = database.CreatePenaltySummaryParams{
-			Gameid: summary.Gameid,
+			GameID: summary.GameID,
 			Period: summary.Period,
 			Time: summary.Time,
 			Team: summary.Team,
@@ -45,18 +45,18 @@ func Test_scrapePenaltySummary(t *testing.T) {
 	}{
 		{"Penalty Shot", 
 			args{
-				doc: loadLocalTestFile("/home/rehmke/workspace/github.com/ehmker/hockey_stats/test_files/penalty_shot_example.htm"),
+				doc: loadLocalTestFile("../../test_files/penalty_shot_example.htm"),
 				ID: "202410170MTL",
 			},
 			[]database.CreatePenaltySummaryParams{
-				{Gameid: "202410170MTL", Period: "1st Period", Time: parsePenTime("09:34"), Team: "LAK", Player: "Andreas Englund", PlayerID: "engluan01", Penalty: "Illegal Check to Head", Pim: 2},
-				{Gameid: "202410170MTL", Period: "2nd Period", Time: parsePenTime("04:28"), Team: "LAK", Player: "Trevor Lewis", PlayerID: "lewistr01", Penalty: "Roughing", Pim: 2},
-				{Gameid: "202410170MTL", Period: "2nd Period", Time: parsePenTime("04:42"), Team: "MTL", Player: "Kirby Dach", PlayerID: "dachki01", Penalty: "Hooking", Pim: 2},
-				{Gameid: "202410170MTL", Period: "2nd Period", Time: parsePenTime("10:03"), Team: "LAK", Player: "Caleb Jones", PlayerID: "jonesca01", Penalty: "Interference", Pim: 2},
-				{Gameid: "202410170MTL", Period: "2nd Period", Time: parsePenTime("19:07"), Team: "LAK", Player: "Kevin Fiala", PlayerID: "fialake01", Penalty: "Interference", Pim: 2},
-				{Gameid: "202410170MTL", Period: "3rd Period", Time: parsePenTime("02:51"), Team: "MTL", Player: "Arber Xhekaj", PlayerID: "xhekaar01", Penalty: "Holding", Pim: 2},
-				{Gameid: "202410170MTL", Period: "3rd Period", Time: parsePenTime("07:10"), Team: "MTL", Player: "Lane Hutson", PlayerID: "hutsola01", Penalty: "Interference on breakaway (Penalty Shot)", Pim: 0},
-				{Gameid: "202410170MTL", Period: "3rd Period", Time: parsePenTime("18:12"), Team: "LAK", Player: "Trevor Moore", PlayerID: "mooretr01", Penalty: "Tripping", Pim: 2},
+				{GameID: "202410170MTL", Period: "1st Period", Time: parsePenTime("09:34"), Team: "LAK", Player: "Andreas Englund", PlayerID: "engluan01", Penalty: "Illegal Check to Head", Pim: 2},
+				{GameID: "202410170MTL", Period: "2nd Period", Time: parsePenTime("04:28"), Team: "LAK", Player: "Trevor Lewis", PlayerID: "lewistr01", Penalty: "Roughing", Pim: 2},
+				{GameID: "202410170MTL", Period: "2nd Period", Time: parsePenTime("04:42"), Team: "MTL", Player: "Kirby Dach", PlayerID: "dachki01", Penalty: "Hooking", Pim: 2},
+				{GameID: "202410170MTL", Period: "2nd Period", Time: parsePenTime("10:03"), Team: "LAK", Player: "Caleb Jones", PlayerID: "jonesca01", Penalty: "Interference", Pim: 2},
+				{GameID: "202410170MTL", Period: "2nd Period", Time: parsePenTime("19:07"), Team: "LAK", Player: "Kevin Fiala", PlayerID: "fialake01", Penalty: "Interference", Pim: 2},
+				{GameID: "202410170MTL", Period: "3rd Period", Time: parsePenTime("02:51"), Team: "MTL", Player: "Arber Xhekaj", PlayerID: "xhekaar01", Penalty: "Holding", Pim: 2},
+				{GameID: "202410170MTL", Period: "3rd Period", Time: parsePenTime("07:10"), Team: "MTL", Player: "Lane Hutson", PlayerID: "hutsola01", Penalty: "Interference on breakaway (Penalty Shot)", Pim: 0},
+				{GameID: "202410170MTL", Period: "3rd Period", Time: parsePenTime("18:12"), Team: "LAK", Player: "Trevor Moore", PlayerID: "mooretr01", Penalty: "Tripping", Pim: 2},
 				
 			},
 		},

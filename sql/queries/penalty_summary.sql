@@ -2,7 +2,7 @@
 INSERT INTO
     penalty_summaries (
         id,
-        gameid,
+        game_id,
         created_at,
         updated_at,
         period,

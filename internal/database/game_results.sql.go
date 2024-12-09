@@ -16,6 +16,7 @@ INSERT INTO
         id,
         created_at, 
         updated_at, 
+        season,
         date_played, 
         arena,
         attendance,
@@ -30,14 +31,15 @@ INSERT INTO
         away_team_record
     )
 VALUES
-    ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
-RETURNING id, created_at, updated_at, date_played, arena, attendance, duration, home_team, home_team_score, home_team_result, home_team_record, away_team, away_team_score, away_team_result, away_team_record
+    ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+RETURNING id, created_at, updated_at, date_played, season, arena, attendance, duration, home_team, home_team_score, home_team_result, home_team_record, away_team, away_team_score, away_team_result, away_team_record
 `
 
 type CreateGameResultParams struct {
 	ID             string
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
+	Season         int32
 	DatePlayed     time.Time
 	Arena          string
 	Attendance     int32
@@ -57,6 +59,7 @@ func (q *Queries) CreateGameResult(ctx context.Context, arg CreateGameResultPara
 		arg.ID,
 		arg.CreatedAt,
 		arg.UpdatedAt,
+		arg.Season,
 		arg.DatePlayed,
 		arg.Arena,
 		arg.Attendance,
@@ -76,6 +79,7 @@ func (q *Queries) CreateGameResult(ctx context.Context, arg CreateGameResultPara
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DatePlayed,
+		&i.Season,
 		&i.Arena,
 		&i.Attendance,
 		&i.Duration,

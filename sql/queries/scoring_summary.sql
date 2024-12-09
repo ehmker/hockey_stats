@@ -2,14 +2,14 @@
 INSERT INTO
     scoring_summaries (
         id,
-        gameid,
+        game_id,
         created_at,
         updated_at,
         period,
         time, 
         team,
-        scoring_player,
-        scoring_player_id,
+        player,
+        player_id,
         first_assist,
         first_assist_id,
         second_assist, 

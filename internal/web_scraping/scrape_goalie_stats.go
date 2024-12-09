@@ -11,10 +11,11 @@ import (
 	"github.com/google/uuid"
 )
 
-func AddGoalieStats(s shared.State, doc *goquery.Document, gameID string) {
+func addGoalieStats(s shared.State, doc *goquery.Document, gameID string, season int32) {
 	goalieStats := scrapeGoalieStats(doc, gameID)
 
 	for _, statline := range goalieStats {
+		statline.Season = season
 		_, err := s.DB.CreateGoalieStats(context.Background(), statline)
 		if err != nil {
 			log.Println(err)
@@ -40,15 +41,15 @@ func scrapeGoalieStats (doc *goquery.Document, ID string) []database.CreateGoali
 				ID: uuid.New(),
 				CreatedAt: time.Now(),
 				UpdatedAt: time.Now(),
-				Gameid: ID,
+				GameID: ID,
 				Team: team,
 				PlayerName: goalie.name,
-				Playerid: goalie.id,
+				PlayerID: goalie.id,
 				Decision: getTextStatFromCell_CanBeNull("decision",row),
 				GoalsAgainst: getIntStatFromCell("goals_against", row),
 				ShotsAgainst: getIntStatFromCell("shots_against", row),
 				Saves: getIntStatFromCell("saves", row),
-				Shutout: intToBool(getIntStatFromCell("shutouts", row)), // shutout either 1 or 0
+				Shutout: getIntStatFromCell("shutouts", row), // shutout either 1 or 0
 				PenMins: getIntStatFromCell("pen_min", row),
 				TimeOnIce: getTimeStatFromCell("time_on_ice", row),
 			}

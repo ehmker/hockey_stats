@@ -15,7 +15,7 @@ import (
 const createShot = `-- name: CreateShot :one
 INSERT INTO shots (
     id, 
-    gameid, 
+    game_id, 
     created_at,
     updated_at,
     team, 
@@ -26,12 +26,12 @@ INSERT INTO shots (
 )
 VALUES
 ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-RETURNING id, gameid, created_at, updated_at, team, player, x_loc, y_loc, goal
+RETURNING id, game_id, created_at, updated_at, team, player, x_loc, y_loc, goal
 `
 
 type CreateShotParams struct {
 	ID        uuid.UUID
-	Gameid    string
+	GameID    string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Team      string
@@ -44,7 +44,7 @@ type CreateShotParams struct {
 func (q *Queries) CreateShot(ctx context.Context, arg CreateShotParams) (Shot, error) {
 	row := q.db.QueryRowContext(ctx, createShot,
 		arg.ID,
-		arg.Gameid,
+		arg.GameID,
 		arg.CreatedAt,
 		arg.UpdatedAt,
 		arg.Team,
@@ -56,7 +56,7 @@ func (q *Queries) CreateShot(ctx context.Context, arg CreateShotParams) (Shot, e
 	var i Shot
 	err := row.Scan(
 		&i.ID,
-		&i.Gameid,
+		&i.GameID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Team,

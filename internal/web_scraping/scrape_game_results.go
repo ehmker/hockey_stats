@@ -13,14 +13,17 @@ import (
 	"github.com/ehmker/hockey_stats/internal/shared"
 )
 
-func AddGameResults(s shared.State, doc *goquery.Document, gameID string) {
+// Gets the game details and adds to DB, returns the season value for use in other Add functions
+func addGameResults(s shared.State, doc *goquery.Document, gameID string) (database.CreateGameResultParams, error) {
 	gameResult, err := ScrapeGameResults(doc, gameID)
 	if err != nil {
-		log.Printf("error scraping game results: %v\n", err)
-		return
+		return database.CreateGameResultParams{}, err
 	}
-	s.DB.CreateGameResult(context.Background(), gameResult)
-
+	_, err = s.DB.CreateGameResult(context.Background(), gameResult)
+	if err != nil {
+		return database.CreateGameResultParams{}, err
+	}
+	return gameResult, nil
 }
 
 func ScrapeGameResults (doc *goquery.Document, gameID string) (database.CreateGameResultParams, error) {
@@ -161,7 +164,18 @@ func ScrapeGameResults (doc *goquery.Document, gameID string) (database.CreateGa
 			results.HomeTeamResult = "L"
 		}
 	}
-
+	results.Season = setSeason(results.DatePlayed)
 
 	return results, nil
+}
+
+//Sets the season based on the date the game was played.  
+//If played before Aug 1st, the season is set to the same as the year the game was played
+//otherwise the following year. 
+func setSeason(d time.Time) int32 {
+	new_season_start := time.Date(d.Year(), time.August, 1, 0, 0, 0, 0, time.UTC)
+	if d.Before(new_season_start) {
+		return int32(d.Year())
+	}
+	return int32(d.Year() + 1)
 }
